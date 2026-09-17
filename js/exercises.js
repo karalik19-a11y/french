@@ -57,7 +57,7 @@ window.EX = (() => {
     if (opts.length < 3) return null;
     return {
       type: "c", srsKey: "v:" + e.f.toLowerCase(), tts: e.f,
-      prompt: `Прослушай и выбери перевод: <button class="spk big" data-say="${esc(e.f)}">🔊 Прослушать</button>`,
+      prompt: `Прослушай и выбери перевод: <button class="spk big" data-say="${esc(e.f)}">Прослушать</button>`,
       options: shuffle([e.r, ...opts]), answer: e.r,
       explain: `${e.f} — ${e.r}`, revealAnswer: true
     };

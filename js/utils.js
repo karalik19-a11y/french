@@ -77,8 +77,11 @@ function md(text, opts = {}) {
   return out;
 }
 
+// Иконка динамика (SVG, красится в currentColor)
+const SPK_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 4.8 6.2 8.8H3.6a1 1 0 0 0-1 1v4.4a1 1 0 0 0 1 1h2.6l4.8 4V4.8z" fill="currentColor"/><path d="M15.2 8.6a4.8 4.8 0 0 1 0 6.8M18 5.9a8.6 8.6 0 0 1 0 12.2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>';
+
 // Кнопка озвучки
-const spkBtn = (text, extra = "") => `<button class="spk ${extra}" data-say="${esc(text)}" title="Прослушать">🔊</button>`;
+const spkBtn = (text, extra = "") => `<button class="spk ${extra}" data-say="${esc(text)}" title="Прослушать">${SPK_ICON}</button>`;
 
 // Глобальная обработка кликов по 🔊
 document.addEventListener("click", e => {

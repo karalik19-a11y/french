@@ -14,44 +14,67 @@
 
   function navigate(hash) { location.hash = hash; }
 
+  // ---------- Иконки (SVG, в стиле SF Symbols) ----------
+  const ic = p => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
+  const IC = {
+    home: ic('<path d="M3.8 10.7 12 3.8l8.2 6.9"/><path d="M6 9.5V19a1.2 1.2 0 0 0 1.2 1.2h2.9v-5.2a1.9 1.9 0 0 1 3.8 0v5.2h2.9A1.2 1.2 0 0 0 18 19V9.5"/>'),
+    grad: ic('<path d="M12 3.9 2.6 8.2l9.4 4.3 9.4-4.3L12 3.9z"/><path d="M6.4 10.6v4.5c0 1.7 2.5 3.1 5.6 3.1s5.6-1.4 5.6-3.1v-4.5"/><path d="M21.4 8.2v5.3"/>'),
+    cards: ic('<rect x="3.7" y="7" width="12.6" height="14.1" rx="2.5"/><path d="M8.4 4.6l10.1 2.1a2 2 0 0 1 1.6 2.4l-1.5 6.9"/>'),
+    lib: ic('<rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/>'),
+    chart: ic('<path d="M5 20v-6.3M10 20V5.6M15 20v-9.2M20 20V9.3"/>'),
+    back: ic('<path d="M14.8 5.6 8.4 12l6.4 6.4"/>'),
+    flame: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.7 2.2c.2 2.6-.9 4.2-2.2 5.7C9.1 9.5 7.6 11 7.6 13.6c0 3.7 3 6.2 6.4 6.2 3.2 0 5.6-2.4 5.6-5.4 0-2.4-1.2-3.9-2.3-5.3.1 1.7-.6 2.9-1.6 3.4.5-2.4-.3-5-1.5-6.7-.7-1-1.2-2.3-1.5-3.6z" fill="currentColor"/></svg>',
+    verb: ic('<rect x="3.6" y="4.2" width="16.8" height="15.6" rx="2.4"/><path d="M3.6 9.8h16.8M9.6 9.8v10"/>'),
+    grammar: ic('<path d="M12 4v16M5 8l14 8M19 8 5 16"/>'),
+    read: ic('<path d="M12 6.5C10.2 5 7.6 4.3 4 4.3v13.2c3.6 0 6.2.7 8 2.1 1.8-1.4 4.4-2.1 8-2.1V4.3c-3.6 0-6.2.7-8 2.2z"/><path d="M12 6.5v13.1"/>'),
+    chat: ic('<path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5c-1.6 0-3-.4-4.3-1.1L3 20l1.1-5.2A8.5 8.5 0 1 1 21 11.5z"/>'),
+    spark: ic('<path d="M12 4l1.8 5.2L19 11l-5.2 1.8L12 18l-1.8-5.2L5 11l5.2-1.8L12 4z"/>'),
+    wave: ic('<path d="M4 10v4M8 7v10M12 4.5v15M16 7v10M20 10v4"/>'),
+    compass: ic('<circle cx="12" cy="12" r="8.5"/><path d="M15.2 8.8l-1.8 4.6-4.6 1.8 1.8-4.6 4.6-1.8z"/>')
+  };
+
+  const TABS = [
+    { id: "home", label: "Главная", href: "#/home", icon: IC.home },
+    { id: "course", label: "Курс", href: "#/course", icon: IC.grad },
+    { id: "trainer", label: "Тренажёр", href: "#/trainer", icon: IC.cards, badge: true },
+    { id: "library", label: "Ещё", href: "#/library", icon: IC.lib },
+    { id: "progress", label: "Прогресс", href: "#/progress", icon: IC.chart }
+  ];
+
+  const ROUTE_TITLES = {
+    home: "Главная", course: "Курс", trainer: "Тренажёр", library: "Ещё", progress: "Прогресс",
+    verbs: "Спряжения", grammar: "Грамматика", reading: "Чтение", dialogues: "Диалоги",
+    idioms: "Идиомы", phon: "Фонетика", method: "Методика"
+  };
+  const LIB_ROUTES = ["verbs", "grammar", "reading", "dialogues", "idioms", "phon", "method"];
+  let backTarget = null;
+
   // ---------- Оболочка ----------
   function renderShell() {
     document.body.innerHTML = `
       <div class="app">
-        <aside class="sidebar" id="sidebar">
-          <div class="logo">
-            <div class="logo-flag"><span></span><span></span><span></span></div>
-            <div class="logo-text">Французский<br><b>для Дани</b></div>
+        <header class="topbar">
+          <button class="tb-back" id="tbBack" aria-label="Назад">${IC.back}<span id="tbBackLabel">Ещё</span></button>
+          <div class="tb-brand"><span class="flagmark"></span><span class="tb-brand-name">Le français</span></div>
+          <div class="tb-title" id="tbTitle">Главная</div>
+          <div class="tb-right">
+            <div class="streak-chip" title="Дней подряд">${IC.flame}<b id="streakNum">0</b></div>
           </div>
-          <nav class="nav" id="nav">
-            <a href="#/home" data-r="home"><span class="nav-ico">🏠</span> Главная</a>
-            <a href="#/course" data-r="course"><span class="nav-ico">🎓</span> Курс</a>
-            <a href="#/trainer" data-r="trainer"><span class="nav-ico">🃏</span> Тренажёр <span class="badge" id="dueBadge"></span></a>
-            <a href="#/verbs" data-r="verbs"><span class="nav-ico">📖</span> Спряжения</a>
-            <a href="#/grammar" data-r="grammar"><span class="nav-ico">🧩</span> Грамматика</a>
-            <a href="#/reading" data-r="reading"><span class="nav-ico">📚</span> Чтение</a>
-            <a href="#/dialogues" data-r="dialogues"><span class="nav-ico">💬</span> Диалоги</a>
-            <a href="#/idioms" data-r="idioms"><span class="nav-ico">🗣️</span> Идиомы</a>
-            <a href="#/phon" data-r="phon"><span class="nav-ico">🔉</span> Фонетика</a>
-            <a href="#/method" data-r="method"><span class="nav-ico">🧭</span> Методика</a>
-            <a href="#/progress" data-r="progress"><span class="nav-ico">📈</span> Прогресс</a>
-          </nav>
-          <div class="sidebar-foot">
-            <div class="streak-box">🔥 <b id="streakNum">0</b> ${"дн."}</div>
-            <div class="goal-box">Цель: <b id="goalNum">0</b>/%</div>
-          </div>
-        </aside>
-        <main class="main" id="main"><div class="loading">Загрузка базы...</div></main>
+        </header>
+        <main class="main" id="main"><div class="loading">Загрузка базы…</div></main>
+        <nav class="tabbar" id="tabbar" aria-label="Разделы">
+          ${TABS.map(t => `<a class="tab" data-tab="${t.id}" href="${t.href}"><span class="tab-ico">${t.icon}</span><span class="tab-label">${t.label}</span>${t.badge ? '<em class="badge" id="dueBadge"></em>' : ""}</a>`).join("")}
+        </nav>
       </div>`;
     main = $("#main");
+    $("#tbBack").addEventListener("click", () => { if (backTarget) navigate(backTarget); });
     updateBadges();
   }
 
   function updateBadges() {
     const st = SRS.todayStats();
-    const b = $("#dueBadge"); if (b) { b.textContent = st.due || ""; b.style.display = st.due ? "inline-block" : "none"; }
+    const b = $("#dueBadge"); if (b) { b.textContent = st.due || ""; b.style.display = st.due ? "flex" : "none"; }
     const s = $("#streakNum"); if (s) s.textContent = st.streak;
-    const g = $("#goalNum"); if (g) g.textContent = Math.min(100, Math.round((st.rev + st.new) / Math.max(1, settings.dailyGoal) * 100));
   }
 
   // ---------- Роутер ----------
@@ -59,71 +82,139 @@
     const h = location.hash || "#/home";
     const parts = h.slice(2).split("/");
     const route = parts[0] || "home";
-    $$("#nav a").forEach(a => a.classList.toggle("active", a.dataset.r === route));
+    const tab = LIB_ROUTES.includes(route) ? "library" : route;
+    $$(".tabbar .tab").forEach(a => a.classList.toggle("active", a.dataset.tab === tab));
+    // кнопка «назад» для вложенных экранов
+    const isChild = parts.length > 1;
+    backTarget = isChild ? (route === "course" ? "#/course" : "#/library") : null;
+    const tb = $("#tbBack");
+    if (tb) {
+      document.body.classList.toggle("has-back", !!backTarget);
+      if (backTarget) $("#tbBackLabel").textContent = route === "course" ? "Курс" : "Ещё";
+    }
+    const t = $("#tbTitle"); if (t) t.textContent = ROUTE_TITLES[route] || "Главная";
+    document.body.classList.remove("in-session");
     TTS.stop();
     const fn = screens[route] || screens.home;
     main.innerHTML = "";
-    main.scrollTop = 0;
+    window.scrollTo(0, 0);
     fn(parts.slice(1));
     updateBadges();
+    // мягкое появление экрана
+    main.classList.remove("anim");
+    void main.offsetWidth;
+    main.classList.add("anim");
+    document.body.classList.remove("scrolled");
   }
   window.addEventListener("hashchange", router);
+
+  // компактный заголовок в шапке при прокрутке
+  window.addEventListener("scroll", () => {
+    document.body.classList.toggle("scrolled", window.scrollY > 44);
+  }, { passive: true });
 
   const h1 = (t, sub = "") => `<div class="page-head"><h1>${t}</h1>${sub ? `<p class="sub">${sub}</p>` : ""}</div>`;
 
   // ---------- Главная ----------
+  function ringSVG(pct) {
+    const R = 26, C = 2 * Math.PI * R;
+    return `<svg class="ring" viewBox="0 0 64 64" aria-hidden="true">
+      <circle cx="32" cy="32" r="${R}" class="ring-bg"/>
+      <circle cx="32" cy="32" r="${R}" class="ring-fill" style="stroke-dasharray:${C.toFixed(1)};stroke-dashoffset:${(C * (1 - pct / 100)).toFixed(1)}"/>
+    </svg>`;
+  }
+
   screens.home = () => {
     const st = SRS.todayStats();
     const mat = SRS.maturity();
+    const done = st.rev + st.new;
+    const goalPct = Math.min(100, Math.round(done / Math.max(1, settings.dailyGoal) * 100));
     const lvl = DB.course.find(l => l.lv === settings.lastLevel) || DB.course[0];
     const unlocked = isUnlocked(lvl.lv);
-    const nextUnit = unlocked ? lvl.units[0] : null;
     const idiom = DB.idioms[(new Date().getDate() * 7 + new Date().getMonth() * 31) % DB.idioms.length];
+    const hr = new Date().getHours();
+    const greet = hr < 5 ? "Bonne nuit" : hr < 18 ? "Bonjour" : "Bonsoir";
+    const dateStr = new Date().toLocaleDateString("ru-RU", { weekday: "long", day: "numeric", month: "long" });
     main.innerHTML = `
-      ${h1("Bonjour, Даня! 👋", "Твой личный путь к свободному французскому")}
-      <div class="dash-grid">
-        <div class="card stat-card big">
-          <div class="stat-title">Сегодня</div>
-          <div class="stat-row">
-            <div class="stat"><b>${st.due}</b><span>карт к повтору</span></div>
-            <div class="stat"><b>${st.rev + st.new}</b><span>из ${settings.dailyGoal} цели</span></div>
-            <div class="stat"><b>${st.streak}</b><span>дней подряд 🔥</span></div>
-          </div>
-          <div class="goalbar"><div class="goalbar-fill" style="width:${Math.min(100, (st.rev + st.new) / settings.dailyGoal * 100)}%"></div></div>
-          <div class="dash-btns">
-            <a class="btn primary" href="#/trainer">🃏 Тренажёр${st.due ? ` (${st.due})` : ""}</a>
-            <a class="btn" href="#/course/lvl/${lvl.lv}">🎓 Продолжить курс · Ур. ${lvl.lv} (${lvl.cefr})</a>
-          </div>
-        </div>
-        <div class="card stat-card">
-          <div class="stat-title">База знаний</div>
-          <div class="stat-mini">📖 ${DB.verbs.length} глаголов × 15 времён</div>
-          <div class="stat-mini">🗂 ${DB.vocab.length} слов и выражений</div>
-          <div class="stat-mini">🧩 ${DB.grammar.length} уроков грамматики</div>
-          <div class="stat-mini">🗣 ${DB.idioms.length} идиом и пословиц</div>
-          <div class="stat-mini">📚 ${DB.reading.length} текстов + ${DB.dialogues.length} диалогов</div>
-          <div class="stat-mini">🧠 В SRS: ${mat.total} (${mat.pct}% зрелых)</div>
-        </div>
-        <div class="card stat-card idiom-card">
-          <div class="stat-title">Выражение дня</div>
-          <div class="idiom-fr">${spkBtn(idiom.fr)} <b>${esc(idiom.fr)}</b></div>
-          <div class="idiom-lit">${esc(idiom.lit)}</div>
-          <div class="idiom-ru">${esc(idiom.ru)}</div>
-          ${idiom.ex ? `<div class="idiom-ex">${spkBtn(idiom.ex)}${esc(idiom.ex)}</div>` : ""}
-          <a class="btn small" href="#/idioms">Все идиомы →</a>
-        </div>
+      <div class="page-head home-head">
+        <p class="date-cap">${dateStr}</p>
+        <h1>${greet}, <span class="serif-it">Даня</span></h1>
+        <p class="sub">Путь к свободному французскому — A1 → C1</p>
       </div>
-      ${!TTS.hasFrenchVoice() ? `<div class="warn-box">⚠️ В системе не найден французский голос для озвучки. Установите французский язык/голос в настройках системы (Windows: Параметры → Время и язык → Речь; macOS: System Settings → Accessibility → Spoken Content → System Voice → French; Android/iOS: добавьте французскую клавиатуру/голос). Кнопки 🔊 заработают автоматически.</div>` : ""}
-      <div class="card">
-        <div class="stat-title">Как заниматься эффективно (кратко)</div>
+
+      <section class="hero">
+        <div class="hero-top">
+          <div class="hero-ring">${ringSVG(goalPct)}<span class="hero-ring-label"><b>${goalPct}%</b>цели</span></div>
+          <div class="hero-stats">
+            <div class="hero-stat"><b>${st.due}</b><span>карт к повтору</span></div>
+            <div class="hero-stat"><b>${done}</b><span>из ${settings.dailyGoal} на сегодня</span></div>
+            <div class="hero-stat"><b>${st.streak}</b><span>${pluralRu(st.streak, "день", "дня", "дней")} подряд</span></div>
+          </div>
+        </div>
+        <div class="hero-btns">
+          <a class="btn hero-primary" href="#/trainer">${st.due ? `Повторить ${st.due}` : "Тренироваться"}</a>
+          <a class="btn hero-ghost" href="#/course/lvl/${lvl.lv}">Ур. ${lvl.lv} · ${lvl.cefr}</a>
+        </div>
+      </section>
+
+      <div class="qa-grid">
+        <a class="qa-tile" href="#/course"><span class="qa-ico c-blue">${IC.grad}</span><span class="qa-t">Курс</span><span class="qa-s">${unlocked ? `Уровень ${lvl.lv} · ${lvl.cefr}` : "Открой уровень " + lvl.lv}</span></a>
+        <a class="qa-tile" href="#/verbs"><span class="qa-ico c-violet">${IC.verb}</span><span class="qa-t">Спряжения</span><span class="qa-s">${DB.verbs.length} глаголов</span></a>
+        <a class="qa-tile" href="#/grammar"><span class="qa-ico c-teal">${IC.grammar}</span><span class="qa-t">Грамматика</span><span class="qa-s">${DB.grammar.length} уроков</span></a>
+        <a class="qa-tile" href="#/dialogues"><span class="qa-ico c-green">${IC.chat}</span><span class="qa-t">Диалоги</span><span class="qa-s">${DB.dialogues.length} с озвучкой</span></a>
+      </div>
+
+      <section class="card idiom-card">
+        <div class="card-cap">Выражение дня</div>
+        <div class="idiom-fr">${spkBtn(idiom.fr)}<b>${esc(idiom.fr)}</b></div>
+        <div class="idiom-lit">буквально: ${esc(idiom.lit)}</div>
+        <div class="idiom-ru">${esc(idiom.ru)}</div>
+        ${idiom.ex ? `<div class="idiom-ex">${spkBtn(idiom.ex)}${esc(idiom.ex)}</div>` : ""}
+        <a class="link-more" href="#/idioms">Все выражения</a>
+      </section>
+
+      <section class="card">
+        <div class="card-cap">База знаний</div>
+        <div class="kb-grid">
+          <div><b>${DB.vocab.length}</b><span>слов</span></div>
+          <div><b>${DB.verbs.length}</b><span>глаголов</span></div>
+          <div><b>${DB.grammar.length}</b><span>уроков</span></div>
+          <div><b>${DB.reading.length}</b><span>текстов</span></div>
+          <div><b>${DB.idioms.length}</b><span>идиом</span></div>
+          <div><b>${mat.total}</b><span>карт в SRS</span></div>
+        </div>
+      </section>
+
+      ${!TTS.hasFrenchVoice() ? `<div class="warn-box">В системе не найден французский голос для озвучки. Установите французский язык/голос в настройках системы (Windows: Параметры → Время и язык → Речь; macOS: System Settings → Accessibility → Spoken Content → System Voice → French; Android/iOS: добавьте французскую клавиатуру/голос). Кнопки озвучки заработают автоматически.</div>` : ""}
+
+      <section class="card">
+        <div class="card-cap">Как заниматься эффективно</div>
         <ol class="md-ol">
-          <li><b>Каждый день</b> — 30–60 минут лучше марафонов раз в неделю. Держи стрик 🔥</li>
-          <li>Сначала <b>карточки</b> (повторить просроченное), потом новый материал.</li>
-          <li>Всё французское <b>проговаривай вслух</b> — кнопки 🔊 помогут с произношением.</li>
+          <li><b>Каждый день</b> — 30–60 минут лучше марафонов раз в неделю.</li>
+          <li>Сначала <b>повторение</b> просроченного, потом новый материал.</li>
+          <li>Всё французское <b>проговаривай вслух</b> — кнопки озвучки помогут.</li>
           <li>Уровень закрывается <b>тестом на ${lvl.pass}%+</b> — или включи свободную навигацию в <a href="#/progress">Прогрессе</a>.</li>
           <li>Читай тексты своего уровня: правило <b>95% понимания</b>.</li>
         </ol>
-        <a class="btn small" href="#/method">Полная методика →</a>
+        <a class="link-more" href="#/method">Полная методика</a>
+      </section>`;
+  };
+
+  // ---------- Ещё (библиотека разделов) ----------
+  screens.library = () => {
+    const items = [
+      { href: "#/verbs", title: "Спряжения", sub: `${DB.verbs.length} глаголов · 15 времён · озвучка`, icon: IC.verb, cls: "c-blue" },
+      { href: "#/grammar", title: "Грамматика", sub: `${DB.grammar.length} уроков A1 → C1 · квизы`, icon: IC.grammar, cls: "c-violet" },
+      { href: "#/reading", title: "Чтение", sub: `${DB.reading.length} текстов + классика в оригинале`, icon: IC.read, cls: "c-green" },
+      { href: "#/dialogues", title: "Диалоги", sub: `${DB.dialogues.length} диалогов · shadowing`, icon: IC.chat, cls: "c-teal" },
+      { href: "#/idioms", title: "Идиомы", sub: `${DB.idioms.length} выражений · викторина`, icon: IC.spark, cls: "c-orange" },
+      { href: "#/phon", title: "Фонетика", sub: "Звуки, правила чтения, скороговорки", icon: IC.wave, cls: "c-red" },
+      { href: "#/method", title: "Методика", sub: "Техники, планы занятий, ресурсы", icon: IC.compass, cls: "c-ink" }
+    ];
+    main.innerHTML = `
+      ${h1("Ещё", "Весь материал курса — от спряжений до классики")}
+      <div class="lib-grid">
+        ${items.map(i => `<a class="lib-tile" href="${i.href}"><span class="qa-ico ${i.cls}">${i.icon}</span><span class="lib-txt"><b>${i.title}</b><span>${i.sub}</span></span></a>`).join("")}
       </div>`;
   };
 
@@ -224,12 +315,15 @@
   // Общий запуск сессии упражнений поверх экрана
   function openSession(questions, title, pass, onFinish) {
     if (!questions.length) { alert("Не удалось составить упражнения — мало данных."); return; }
+    document.body.classList.add("in-session");
     main.innerHTML = `<div class="session-wrap"><div id="sessionBox"></div></div>`;
+    window.scrollTo(0, 0);
     EX.runSession(questions, {
       container: $("#sessionBox"), title, pass,
       onFinish: (res) => {
         updateBadges();
         if (onFinish) onFinish(res);
+        if (!res.finished) router(); // «Готово» — вернуться на экран раздела
       }
     });
   }
@@ -247,8 +341,8 @@
             <div class="stat"><b>${st.new}</b><span>новых сегодня</span></div>
           </div>
           <div class="dash-btns">
-            <button class="btn primary" id="btnDue">▶ Повторить просроченные${st.due ? ` (${st.due})` : ""}</button>
-            <button class="btn" id="btnNew">✚ Выучить новые слова (${settings.newPerDay})</button>
+            <button class="btn primary" id="btnDue">Повторить просроченные${st.due ? ` · ${st.due}` : ""}</button>
+            <button class="btn" id="btnNew">Новые слова · ${settings.newPerDay}</button>
           </div>
           <div class="ctx">Оценки после ответа: «Забыл» вернёт карточку через 10 минут, «Хорошо» удлинит интервал, «Легко» — сильнее.</div>
         </div>
@@ -455,7 +549,7 @@
       </div>` : ""}
       ${g.points && g.points.length ? `<div class="card"><div class="stat-title">Запомнить</div><ul class="md-ul">${g.points.map(p => `<li>${esc(p)}</li>`).join("")}</ul></div>` : ""}
       <div class="dash-btns">
-        <button class="btn primary" id="lessonQuiz">📝 Пройти квиз (${g.quiz.length})</button>
+        <button class="btn primary" id="lessonQuiz">Пройти квиз · ${g.quiz.length}</button>
         ${prev ? `<a class="btn" href="#/grammar/${prev.id}">← ${esc(prev.title.split(":")[0])}</a>` : ""}
         ${next ? `<a class="btn" href="#/grammar/${next.id}">${esc(next.title.split(":")[0])} →</a>` : ""}
       </div>`;
@@ -486,7 +580,7 @@
       <div class="dash-btns reader-tools">
         <button class="btn" id="readAll">🔊 Прослушать весь текст</button>
         <button class="btn" id="toggleTr">👁 Показать перевод</button>
-        <button class="btn" id="readQuiz">📝 Вопросы к тексту (${r.questions.length})</button>
+        <button class="btn" id="readQuiz">Вопросы · ${r.questions.length}</button>
       </div>
       <div class="card reader-text">
         ${paras.map(p => `<p class="rt-p">${p.split(/(\s+)/).map(w => {
