@@ -1,6 +1,6 @@
 // Service Worker: сеть прежде всего, кеш — запасной вариант (офлайн)
 "use strict";
-const VERSION = "lf-2.0.1";
+const VERSION = "lf-2.1.0";
 const SHELL_CACHE = `${VERSION}-shell`;
 const RUNTIME_CACHE = `${VERSION}-runtime`;
 
@@ -25,16 +25,20 @@ const SHELL = [
   "css/components.css",
   "css/screens.css",
   "css/motion.css",
+  "css/features.css",
   "icons/icon.svg",
   "icons/icon-180.png",
   "icons/icon-192.png",
   "icons/icon-512.png",
+  "images/cafe-reader.png",
+  "images/snail-plan.png",
   "manifest.webmanifest",
   "js/icons.js",
   "js/utils.js",
   "js/speech.js",
   "js/srs.js",
   "js/activity.js",
+  "js/study_plan.js",
   "js/ui.js",
   "js/core.js",
   "js/exercises.js",
@@ -44,6 +48,7 @@ const SHELL = [
   "js/screen_practice.js",
   "js/screen_vocab.js",
   "js/screen_you.js",
+  "js/screen_plan.js",
   "js/main.js"
 ];
 

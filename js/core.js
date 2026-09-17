@@ -21,6 +21,7 @@ window.App = (() => {
   // ---------- Разделы ----------
   const SECTIONS = {
     home: { ru: "Главная", fr: "Accueil", icon: "home" },
+    plan: { ru: "План 80", fr: "80 jours", icon: "calendar" },
     course: { ru: "Курс", fr: "Le parcours", icon: "path" },
     trainer: { ru: "Тренажёр", fr: "Révision", icon: "cards" },
     cards: { ru: "Карточки", fr: "Cartes", icon: "cards" },
@@ -38,7 +39,7 @@ window.App = (() => {
   };
   const TABS = ["home", "course", "trainer", "library", "profile"];
   const RAIL_GROUPS = [
-    { label: "Aujourd'hui", items: ["home", "trainer", "progress"] },
+    { label: "Aujourd'hui", items: ["home", "plan", "trainer", "progress"] },
     { label: "Apprendre", items: ["course", "vocab", "verbs", "grammar"] },
     { label: "Lire & écouter", items: ["reading", "dialogues", "idioms", "phon"] },
     { label: "Vous", items: ["profile", "library", "method"] }
