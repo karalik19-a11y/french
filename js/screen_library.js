@@ -92,6 +92,7 @@
     Activity.bump("read_texts", Activity.count("read:" + r.id) === 1 ? 1 : 0);
 
     const paras = r.text.split("\n").filter(p => p.trim());
+    const translations = r.translation.split("\n").filter(p => p.trim());
     main.innerHTML = `<div class="screen">
       ${A.screenHead({
       back: "#/reading", backLabel: "Чтение",
@@ -103,15 +104,16 @@
 
       <div class="card card--tight reader__tools">
         <button class="btn btn--primary" type="button" id="readAll">${icon("play", "sm")}Прослушать текст</button>
-        <button class="btn btn--ghost" type="button" id="toggleTr">${icon("eye", "sm")}Перевод</button>
+        <button class="btn btn--ghost" type="button" id="toggleTr">${icon("eye", "sm")}Перевод рядом</button>
         <button class="btn btn--ghost" type="button" id="readQuiz">${icon("pen", "sm")}Вопросы · ${r.questions.length}</button>
+        <span class="reader-size" aria-label="Размер текста"><button type="button" id="fontDown" aria-label="Уменьшить текст">A−</button><button type="button" id="fontUp" aria-label="Увеличить текст">A+</button></span>
       </div>
 
-      <article class="reader">
-        ${paras.map(p => `<p class="rt-p">${p.split(/(\s+)/).map(w => {
+      <article class="reader" id="readerText">
+        ${paras.map((p, pi) => `<div class="reader-pair"><p class="rt-p">${p.split(/(\s+)/).map(w => {
       const clean = w.replace(/[^\p{L}\p{M}'’-]/gu, "");
       return clean ? `<span class="rt-w" data-w="${esc(clean)}">${esc(w)}</span>` : esc(w);
-    }).join("")}</p>`).join("")}
+    }).join("")}</p><p class="rt-inline-tr hidden">${esc(translations[pi] || "")}</p></div>`).join("")}
       </article>
 
       <div class="card hidden" id="trBox">
@@ -141,15 +143,23 @@
       </div>
     </div>`;
 
-    // Перевод
+    // Перевод абзац к абзацу и удобный кегль
     const trBox = $("#trBox", main);
-    const toggleTr = () => {
-      const show = trBox.classList.contains("hidden");
-      trBox.classList.toggle("hidden", !show);
-      $("#toggleTr", main).innerHTML = `${icon(show ? "eyeOff" : "eye", "sm")}${show ? "Скрыть перевод" : "Перевод"}`;
-      if (show) UI.scrollIntoSoft(trBox);
+    const readerText = $("#readerText", main);
+    let bilingual = store.get("reader_bilingual", false);
+    const paintTranslation = () => {
+      $$(".rt-inline-tr", main).forEach(x => x.classList.toggle("hidden", !bilingual));
+      readerText.classList.toggle("reader--bilingual", bilingual);
+      $("#toggleTr", main).innerHTML = `${icon(bilingual ? "eyeOff" : "eye", "sm")}${bilingual ? "Скрыть перевод" : "Перевод рядом"}`;
+      trBox.classList.add("hidden");
     };
-    $("#toggleTr", main).addEventListener("click", toggleTr);
+    $("#toggleTr", main).addEventListener("click", () => { bilingual = !bilingual; store.set("reader_bilingual", bilingual); paintTranslation(); });
+    paintTranslation();
+    let readerScale = clamp(Number(store.get("reader_scale", 1)) || 1, .85, 1.3);
+    const paintScale = () => readerText.style.setProperty("--reader-scale", readerScale);
+    $("#fontDown", main).addEventListener("click", () => { readerScale = clamp(+(readerScale - .1).toFixed(1), .85, 1.3); store.set("reader_scale", readerScale); paintScale(); });
+    $("#fontUp", main).addEventListener("click", () => { readerScale = clamp(+(readerScale + .1).toFixed(1), .85, 1.3); store.set("reader_scale", readerScale); paintScale(); });
+    paintScale();
 
     // Озвучка всего текста
     const readBtn = $("#readAll", main);
@@ -527,6 +537,7 @@
       <article class="lesson">${md(m.intro)}</article>
       <div class="tabs" id="mTabs" role="tablist">
         <button class="tab is-active" type="button" role="tab" data-m="tech">Техники · ${m.techniques.length}</button>
+        <button class="tab" type="button" role="tab" data-m="literature">Читать произведения · ${DB.reading.filter(r => r.author).length}</button>
         <button class="tab" type="button" role="tab" data-m="plans">Планы занятий</button>
         <button class="tab" type="button" role="tab" data-m="res">Учебники и ресурсы</button>
       </div>
@@ -548,8 +559,17 @@
             <div class="tech__text">${md(t.text)}</div>
             <ul class="tech__tips">${t.tips.map(x => `<li>${icon("check", "xs")}<span>${esc(x)}</span></li>`).join("")}</ul>
           </article>`).join("")}</div>`;
+      } else if (p === "literature") {
+        const books = DB.reading.filter(r => r.author);
+        box.innerHTML = `<div class="method-books-intro card card--gold">
+          <img src="images/cafe-reader.png" alt="Карикатура: парижанин читает классический роман за столиком кафе">
+          <div><span class="eyebrow eyebrow--gold">Cabinet de lecture</span><h2 class="display display--3">Классика прямо в приложении</h2><p class="lead">Читайте оригинал с озвучкой, переводом рядом с каждым абзацем и словарём по нажатию. Все тексты ниже доступны офлайн.</p><a class="btn btn--gold btn--sm" href="#/reading">${icon("bookOpen", "sm")}Открыть всю библиотеку</a></div>
+        </div>
+        <div class="method-books" data-stagger=":scope > *">${books.map((r, i) => `<a class="method-book card card--link" href="#/reading/${encodeURIComponent(r.id)}">
+          <span class="method-book__num">${pad2(i + 1)}</span><div class="method-book__body">${cefrBadge(r.lv)}<h3 class="method-book__title">${esc(r.title)}</h3><span class="ctx">${esc(r.author)} · ${esc(r.titleRu)} · ${r.text.split(/\s+/).length} слов</span></div><span>${icon("arrowRight", "sm")}</span>
+        </a>`).join("")}</div>`;
       } else if (p === "plans") {
-        box.innerHTML = `<div class="stack" data-stagger=":scope > *">${m.plans.map(pl => `
+        box.innerHTML = `<div class="card card--accent" style="margin-bottom:16px"><div class="row row--wrap"><span class="list__ico">${icon("calendar", "sm")}</span><div class="col" style="gap:3px;flex:1"><h2 class="h2">Персональный интенсив: 80 учебных дней</h2><p class="ctx">Занятия через день, обязательный чек-лист и все материалы A1→C1 уже распределены.</p></div><a class="btn btn--primary" href="#/plan">Открыть план${icon("arrowRight", "sm")}</a></div></div><div class="stack" data-stagger=":scope > *">${m.plans.map(pl => `
           <article class="card">
             <div class="row" style="gap:10px;margin-bottom:6px;flex-wrap:wrap">
               <h2 class="h2">${esc(pl.title)}</h2>

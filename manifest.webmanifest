@@ -1,20 +1,20 @@
 {
+  "id": "./",
   "name": "Le Français — для Дани",
   "short_name": "Le Français",
-  "description": "Французский с нуля до C1: курс, карточки, спряжения, чтение, диалоги.",
+  "description": "Французский с нуля до C1: план на 80 учебных дней, карточки, чтение и диалоги.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
   "orientation": "portrait-primary",
   "background_color": "#070A12",
   "theme_color": "#070A12",
   "lang": "ru",
+  "categories": ["education", "books"],
   "icons": [
-    {
-      "src": "icons/icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
-    }
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
   ]
 }

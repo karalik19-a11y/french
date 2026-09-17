@@ -205,6 +205,8 @@
     const started = Activity.startedAt();
     const voices = TTS.listVoices();
     const ratePct = Math.round(s.ttsRate * 100);
+    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    const standalone = window.matchMedia && window.matchMedia("(display-mode: standalone)").matches || navigator.standalone;
 
     main.innerHTML = `<div class="screen">
       ${A.screenHead({
@@ -237,13 +239,13 @@
         <div class="stat"><span class="stat__num stat__num--display">${sum.due}</span><span class="stat__cap">к повтору</span></div>
       </div>
 
-      <div class="notice notice--info hidden" id="installRow" style="margin-top:16px">
-        <span class="notice__ico">${icon("download", "sm")}</span>
+      <div class="notice ${standalone ? "notice--ok" : "notice--info"}" id="installRow" style="margin-top:16px">
+        <span class="notice__ico">${icon(standalone ? "check" : "download", "sm")}</span>
         <div style="flex:1;min-width:0">
-          <b>Установить на главный экран</b>
-          <div class="ctx">Запуск в один тап, полноэкранный режим и работа без интернета.</div>
+          <b>${standalone ? "Приложение установлено" : isIOS ? "Установить на iPhone бесплатно" : "Установить на главный экран"}</b>
+          <div class="ctx">${standalone ? "Полноэкранный режим и офлайн-доступ активны." : isIOS ? "В Safari нажмите «Поделиться» → «На экран Домой» → «Добавить». App Store и платный аккаунт разработчика не нужны." : "Запуск в один тап, полноэкранный режим и работа без интернета."}</div>
         </div>
-        <button class="btn btn--ghost btn--sm" type="button" id="installBtn">${icon("plus", "sm")}Установить</button>
+        ${standalone ? "" : `<button class="btn btn--ghost btn--sm" type="button" id="installBtn">${icon(isIOS ? "info" : "plus", "sm")}${isIOS ? "Инструкция" : "Установить"}</button>`}
       </div>
 
       <section class="sec">
@@ -421,6 +423,16 @@
       </section>
     </div>`;
 
+    /* ---------- Установка PWA на iPhone ---------- */
+    const installBtnLocal = $("#installBtn", main);
+    if (installBtnLocal && isIOS) installBtnLocal.addEventListener("click", () => UI.sheet({
+      eyebrow: "Installation · iPhone",
+      title: "Добавить на экран «Домой»",
+      sub: "Бесплатно, без App Store и подписки",
+      body: `<ol class="md-ol"><li>Откройте эту страницу именно в <b>Safari</b>.</li><li>Нажмите кнопку <b>«Поделиться»</b> внизу экрана.</li><li>Прокрутите меню и выберите <b>«На экран Домой»</b>.</li><li>Нажмите <b>«Добавить»</b>. Первый запуск онлайн сохранит все материалы для офлайн-работы.</li></ol><div class="notice notice--ok"><span class="notice__ico">${icon("check", "sm")}</span><span>Курс, чтение, чек-листы и прогресс работают полностью. Озвучка использует встроенный французский голос iPhone.</span></div>`,
+      footer: `<button class="btn btn--primary btn--lg" type="button" data-close>${icon("check", "sm")}Понятно</button>`
+    }));
+
     /* ---------- Ползунки ---------- */
     const goalRange = $("#goalRange", main), goalVal = $("#goalVal", main);
     UI.bindRange(goalRange);
@@ -521,7 +533,9 @@
         favorites: store.get("favorites", null),
         achievementsSeen: store.get("achv_seen", []),
         newLevels: store.get("newLevels", "all"),
-        ttsRate: store.get("ttsRate", A.settings.ttsRate)
+        ttsRate: store.get("ttsRate", A.settings.ttsRate),
+        plan80State: store.get("plan80_state", null),
+        plan80Done: store.get("plan80_done", {})
       };
       const name = `le-francais-${todayISO()}.json`;
       try {
@@ -562,6 +576,8 @@
           if (data.achievementsSeen) store.set("achv_seen", data.achievementsSeen);
           if (data.newLevels) store.set("newLevels", data.newLevels);
           if (data.ttsRate) store.set("ttsRate", data.ttsRate);
+          if (data.plan80State) store.set("plan80_state", data.plan80State);
+          if (data.plan80Done) store.set("plan80_done", data.plan80Done);
           UI.toast({ title: "Прогресс восстановлен", sub: "Перезагружаем экран…", kind: "ok", icon: "check" });
           UI.haptic([12, 50, 16]);
           setTimeout(() => location.reload(), 700);
@@ -593,7 +609,7 @@
         ok: "Очистить", cancel: "Отмена", danger: true
       });
       if (!ok) return;
-      ["settings", "srs_cards", "srs_daily", "srs_meta", "activity", "favorites", "achv_seen", "newLevels", "theme", "motion"]
+      ["settings", "srs_cards", "srs_daily", "srs_meta", "activity", "favorites", "achv_seen", "newLevels", "theme", "motion", "plan80_state", "plan80_done", "reader_bilingual", "reader_scale"]
         .forEach(k => store.del(k));
       UI.toast({ title: "Всё очищено", sub: "Перезагружаем…", kind: "bad", icon: "trash" });
       setTimeout(() => location.reload(), 700);

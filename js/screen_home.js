@@ -85,6 +85,24 @@
         </div>
       </section>
 
+      ${(() => {
+        const pp = StudyPlan.position();
+        const tp = StudyPlan.totalProgress();
+        const dp = StudyPlan.dayProgress(pp.day);
+        return `<section class="sec" aria-label="План на 80 учебных дней">
+          <a class="home-plan card card--link" href="#/plan/${pp.started && !pp.rest ? pp.day : ""}">
+            <img class="home-plan__art" src="images/snail-plan.png" alt="" aria-hidden="true">
+            <div class="home-plan__body">
+              <span class="eyebrow eyebrow--gold">Parcours · A1 → C1</span>
+              <h2 class="display display--3">${pp.started ? (pp.rest ? "Сегодня усваиваем пройденное" : `День ${pp.day}: обязательный чек-лист`) : "Ваш план на 80 учебных дней"}</h2>
+              <p class="lead">${pp.started ? (pp.rest ? "Следующее занятие завтра · ритм 1 через 1" : `${dp.done}/${dp.total} блоков · около 100 минут`) : "Грамматика, слова, чтение и речь — через день, только по материалам приложения."}</p>
+              ${bar(tp.pct / 100, { cls: "gold", size: "sm", aria: `План ${tp.pct}%` })}
+            </div>
+            <span class="home-plan__go">${icon("arrowRight")}</span>
+          </a>
+        </section>`;
+      })()}
+
       <section class="sec" aria-label="Сегодня в числах">
         <div class="stats">
           <div class="stat stat--accent">

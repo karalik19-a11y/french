@@ -1,7 +1,7 @@
 // Запуск приложения
 "use strict";
 (() => {
-  const VERSION = "lf-2.0.0";
+  const VERSION = "lf-2.1.0";
 
   /* ---------- Служебный воркер: офлайн-режим ---------- */
   function registerSW() {
