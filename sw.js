@@ -1,6 +1,6 @@
 // Service Worker: сеть прежде всего, кеш — запасной вариант (офлайн)
 "use strict";
-const VERSION = "lf-2.1.0";
+const VERSION = "lf-2.2.0";
 const SHELL_CACHE = `${VERSION}-shell`;
 const RUNTIME_CACHE = `${VERSION}-runtime`;
 
@@ -87,7 +87,9 @@ self.addEventListener("fetch", event => {
   }
 
   event.respondWith(
-    fetch(req).then(res => {
+    // Не позволяем HTTP-кешу GitHub Pages подмешать файлы от старого релиза.
+    // Cache Storage ниже остаётся офлайн-резервом и обновляется свежим ответом.
+    fetch(new Request(req, { cache: "no-store" })).then(res => {
       if (res && (res.ok || res.type === "opaque")) {
         const copy = res.clone();
         caches.open(RUNTIME_CACHE).then(cache => cache.put(req, copy));
