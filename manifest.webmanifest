@@ -1,0 +1,20 @@
+{
+  "name": "Le Français — для Дани",
+  "short_name": "Le Français",
+  "description": "Французский с нуля до C1: курс, карточки, спряжения, чтение, диалоги.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#070A12",
+  "theme_color": "#070A12",
+  "lang": "ru",
+  "icons": [
+    {
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

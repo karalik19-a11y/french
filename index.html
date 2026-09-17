@@ -1,15 +1,78 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-theme="dark">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Французский для Дани</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5.0">
+  <title>Le Français — для Дани</title>
   <meta name="description" content="Личное приложение для изучения французского языка с нуля до C1: 256 глаголов × 15 времён, 3000 слов, 55 уроков грамматики, чтение классики, диалоги с озвучкой, интервальное повторение.">
+
+  <meta name="theme-color" content="#070A12" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#F4F0E8" media="(prefers-color-scheme: light)">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Le Français">
+  <meta name="format-detection" content="telephone=no">
+
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/icon.svg">
+  <link rel="manifest" href="manifest.webmanifest">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Manrope:wght@300..800&display=swap">
+
   <link rel="stylesheet" href="css/style.css">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🇫🇷</text></svg>">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/screens.css">
+  <link rel="stylesheet" href="css/motion.css">
+
+  <script>
+    /* Ранняя установка темы — без вспышки не того фона */
+    (function () {
+      try {
+        var raw = localStorage.getItem("fd_theme");
+        var pref = raw ? JSON.parse(raw) : "dark";
+        var dark = pref === "dark" || (pref === "auto" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+        document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+      } catch (e) { document.documentElement.setAttribute("data-theme", "dark"); }
+    })();
+  </script>
 </head>
 <body>
-  <div class="boot">Загрузка «Французский для Дани»...</div>
+
+  <!-- Атмосферный фон: базовый цвет + градиенты + свет + архитектурные линии + зерно -->
+  <div class="ambient" id="ambient" aria-hidden="true">
+    <div class="ambient__base"></div>
+    <div class="ambient__par" data-par="0.035"><div class="ambient__glow ambient__glow--blue"></div></div>
+    <div class="ambient__par" data-par="0.055"><div class="ambient__glow ambient__glow--bordeaux"></div></div>
+    <div class="ambient__par" data-par="0.022"><div class="ambient__glow ambient__glow--lavender"></div></div>
+    <div class="ambient__par" data-par="0.016"><div class="ambient__facade"></div></div>
+    <div class="ambient__par" data-par="0.03"><div class="ambient__beam"></div></div>
+    <div class="ambient__noise"></div>
+    <div class="ambient__vignette"></div>
+  </div>
+
+  <!-- Заставка -->
+  <div class="boot" id="boot">
+    <div class="boot__mark">
+      <svg viewBox="0 0 96 96" class="boot__ring" aria-hidden="true">
+        <circle cx="48" cy="48" r="44" class="boot__ring-trail"></circle>
+        <circle cx="48" cy="48" r="44" class="boot__ring-lead"></circle>
+      </svg>
+      <span class="boot__mono">F</span>
+    </div>
+    <div class="boot__word">Le Français</div>
+    <div class="boot__sub">для Дани · A1 → C1</div>
+    <div class="boot__bar"><i></i></div>
+  </div>
+
+  <!-- Приложение -->
+  <div class="app" id="app"></div>
+
+  <!-- Слои поверх контента -->
+  <div class="toast-layer" id="toastLayer" role="status" aria-live="polite"></div>
+  <div class="sheet-layer" id="sheetLayer"></div>
 
   <!-- База данных -->
   <script src="data/verbs.js"></script>
@@ -27,11 +90,25 @@
   <script src="data/course.js"></script>
   <script src="data/methodology.js"></script>
 
-  <!-- Приложение -->
+  <!-- Ядро -->
+  <script src="js/icons.js"></script>
   <script src="js/utils.js"></script>
   <script src="js/speech.js"></script>
   <script src="js/srs.js"></script>
+  <script src="js/activity.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/core.js"></script>
   <script src="js/exercises.js"></script>
-  <script src="js/app.js"></script>
+
+  <!-- Экраны -->
+  <script src="js/screen_home.js"></script>
+  <script src="js/screen_learn.js"></script>
+  <script src="js/screen_library.js"></script>
+  <script src="js/screen_practice.js"></script>
+  <script src="js/screen_vocab.js"></script>
+  <script src="js/screen_you.js"></script>
+
+  <!-- Запуск -->
+  <script src="js/main.js"></script>
 </body>
 </html>
