@@ -27,6 +27,7 @@ const SHELL = [
   "css/motion.css",
   "css/features.css",
   "icons/icon.svg",
+  "icons/icon-180.png",
   "icons/icon-192.png",
   "icons/icon-512.png",
   "images/cafe-reader.png",
