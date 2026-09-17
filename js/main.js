@@ -1,14 +1,30 @@
 // Запуск приложения
 "use strict";
 (() => {
-  const VERSION = "lf-2.1.0";
+  const VERSION = "lf-2.2.0";
 
   /* ---------- Служебный воркер: офлайн-режим ---------- */
   function registerSW() {
     if (!("serviceWorker" in navigator)) return;
     if (!/^https?:$/.test(location.protocol)) return;
-    window.addEventListener("load", () => {
-      navigator.serviceWorker.register("sw.js").catch(() => { /* офлайн недоступен — не критично */ });
+
+    // Новый worker должен приходить с сервера, а не из HTTP-кеша браузера.
+    // После активации один раз перезагружаем вкладку, чтобы весь интерфейс
+    // сразу использовал файлы той же версии.
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
+      if (refreshing) return;
+      refreshing = true;
+      location.reload();
+    });
+
+    window.addEventListener("load", async () => {
+      try {
+        const registration = await navigator.serviceWorker.register("sw.js", {
+          updateViaCache: "none"
+        });
+        await registration.update();
+      } catch (_) { /* офлайн недоступен — не критично */ }
     });
   }
 
