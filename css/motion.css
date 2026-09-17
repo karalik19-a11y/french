@@ -1,0 +1,199 @@
+/* ============================================================
+   Le Français — слой 4: движение
+   ============================================================ */
+
+/* ---------- Появление экрана (переход между страницами) ---------- */
+.screen { animation: screen-in var(--t-4) var(--e-out) both; }
+.screen > * {
+  animation: rise-in var(--t-4) var(--e-out) both;
+  animation-delay: calc(var(--i, 0) * 46ms);
+}
+.screen > *:nth-child(1) { --i: 0; }
+.screen > *:nth-child(2) { --i: 1; }
+.screen > *:nth-child(3) { --i: 2; }
+.screen > *:nth-child(4) { --i: 3; }
+.screen > *:nth-child(5) { --i: 4; }
+.screen > *:nth-child(6) { --i: 5; }
+.screen > *:nth-child(7) { --i: 6; }
+.screen > *:nth-child(8) { --i: 7; }
+.screen > *:nth-child(9) { --i: 8; }
+.screen > *:nth-child(n + 10) { --i: 9; }
+
+@keyframes screen-in {
+  from { opacity: 0; transform: translate3d(0, 8px, 0) scale(.994); filter: blur(3px); }
+  to { opacity: 1; transform: none; filter: blur(0); }
+}
+@keyframes rise-in {
+  from { opacity: 0; transform: translate3d(0, 14px, 0); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes ex-in {
+  from { opacity: 0; transform: translate3d(0, 18px, 0) scale(.985); }
+  to { opacity: 1; transform: none; }
+}
+
+/* ---------- Атмосфера ---------- */
+@keyframes drift-a {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  100% { transform: translate3d(-7vw, 6vh, 0) scale(1.16); }
+}
+@keyframes drift-b {
+  0% { transform: translate3d(0, 0, 0) scale(1.06); }
+  100% { transform: translate3d(6vw, -5vh, 0) scale(1); }
+}
+@keyframes drift-c {
+  0% { transform: translate3d(-4vw, 2vh, 0) scale(.94); }
+  100% { transform: translate3d(4vw, -4vh, 0) scale(1.1); }
+}
+@keyframes beam {
+  0% { opacity: .35; transform: translate3d(-4%, 0, 0) rotate(0deg); }
+  100% { opacity: .8; transform: translate3d(6%, 2%, 0) rotate(1.4deg); }
+}
+@keyframes breathe {
+  0%, 100% { opacity: .78; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.07); }
+}
+
+/* ---------- Заставка ---------- */
+@keyframes boot-ring {
+  0% { stroke-dashoffset: 268; transform: rotate(0deg); }
+  50% { stroke-dashoffset: 90; }
+  100% { stroke-dashoffset: 268; transform: rotate(360deg); }
+}
+@keyframes boot-slide {
+  0% { transform: translateX(-110%); }
+  100% { transform: translateX(330%); }
+}
+
+/* ---------- Прогресс ---------- */
+@keyframes ring-fill {
+  from { stroke-dashoffset: 276.46; }
+  to { stroke-dashoffset: calc(276.46 - 2.7646 * var(--pct, 0)); }
+}
+@keyframes bar-grow {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(var(--val, 0)); }
+}
+@keyframes bar-rise {
+  from { transform: scaleY(0); }
+  to { transform: scaleY(var(--h, 0)); }
+}
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 var(--accent-brd); }
+  70% { box-shadow: 0 0 0 9px transparent; }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+@keyframes ember {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(210, 176, 120, 0); }
+  50% { box-shadow: 0 0 18px -3px rgba(210, 176, 120, .55); }
+}
+@keyframes slide-in-left {
+  from { opacity: 0; transform: translateY(-50%) scaleY(.3); }
+  to { opacity: 1; transform: translateY(-50%) scaleY(1); }
+}
+
+/* ---------- Обратная связь ---------- */
+@keyframes pop-ok {
+  0% { transform: scale(.96); }
+  46% { transform: scale(1.022); }
+  100% { transform: scale(1); }
+}
+@keyframes pop-in {
+  from { opacity: 0; transform: scale(.94) translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  16% { transform: translateX(-7px); }
+  32% { transform: translateX(6px); }
+  50% { transform: translateX(-4px); }
+  68% { transform: translateX(3px); }
+  84% { transform: translateX(-1.5px); }
+}
+@keyframes fb-in {
+  from { opacity: 0; transform: translateY(14px) scale(.985); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes tile-place {
+  from { opacity: 0; transform: scale(.8) translateY(-6px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes fav-pop {
+  0% { transform: scale(.5); }
+  52% { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(18px) scale(.94); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes toast-out {
+  from { opacity: 1; transform: none; }
+  to { opacity: 0; transform: translateY(10px) scale(.96); }
+}
+@keyframes achv-in {
+  0% { opacity: 0; transform: scale(.86) translateY(10px); }
+  60% { opacity: 1; transform: scale(1.03); }
+  100% { opacity: 1; transform: none; }
+}
+@keyframes mic-hint {
+  0%, 100% { opacity: .6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.06); }
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes shimmer {
+  from { background-position: -160% 0; }
+  to { background-position: 260% 0; }
+}
+@keyframes glow-soft {
+  0%, 100% { opacity: .55; }
+  50% { opacity: 1; }
+}
+
+/* ---------- Вспомогательные классы движения ---------- */
+.spin { animation: spin 1s linear infinite; }
+.pulse { animation: glow-soft 2.6s var(--e-in-out) infinite; }
+.shimmer {
+  background-image: linear-gradient(100deg, transparent 24%, rgba(255, 255, 255, .16) 44%, transparent 62%);
+  background-size: 220% 100%;
+  animation: shimmer 2.4s linear infinite;
+}
+.press { transition: transform var(--t-2) var(--e-spring); }
+.press:active, .press.is-press { transform: scale(.96); }
+
+/* Счётчик-«оживление» стрика */
+.bump { animation: pop-ok var(--t-4) var(--e-spring); }
+
+/* ---------- Уважение к настройкам системы ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
+  .screen, .screen > * { opacity: 1 !important; transform: none !important; filter: none !important; }
+  .ring__val { stroke-dashoffset: calc(276.46 - 2.7646 * var(--pct, 0)); }
+  .bar__fill { transform: scaleX(var(--val, 0)); }
+  .chart__bar { transform: scaleY(var(--h, 0)); }
+}
+
+/* Пользовательский переключатель «меньше движения» */
+:root[data-motion="off"] *, :root[data-motion="off"] *::before, :root[data-motion="off"] *::after {
+  animation-duration: 1ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 60ms !important;
+}
+:root[data-motion="off"] .ambient__glow,
+:root[data-motion="off"] .ambient__beam { animation: none !important; }
+:root[data-motion="off"] .ring__val { stroke-dashoffset: calc(276.46 - 2.7646 * var(--pct, 0)); }
+:root[data-motion="off"] .bar__fill { transform: scaleX(var(--val, 0)); }
+:root[data-motion="off"] .chart__bar { transform: scaleY(var(--h, 0)); }
+
+/* Колода: карта выезжает на передний план */
+@keyframes fc-promote {
+  from { transform: translate3d(0, 14px, 0) scale(.955); opacity: .72; filter: blur(1.2px); }
+  to { transform: none; opacity: 1; filter: blur(0); }
+}
+:root[data-motion="off"] .screen, :root[data-motion="off"] .screen > * { opacity: 1; transform: none; filter: none; }
+:root[data-motion="off"] .streak-pill.is-hot { animation: none !important; }
